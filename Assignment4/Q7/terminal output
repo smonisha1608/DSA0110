@@ -1,0 +1,6 @@
+$ g++ -std=c
+[RENTED]   TN-09-CA-1001 (StandardCar)
+[REJECTED] TN-09-CA-1001 is already rented.
+[RENTED]   TN-09-EV-2002 (EVCar)
+[RETURNED] TN-09-CA-1001 | Total Bill: Rs. 4530.00
+[RETURNED] TN-09-EV-2002 | Total Bill: Rs. 8960.00

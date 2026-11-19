@@ -1,0 +1,15 @@
+$ g++ -std=c++17 -Wall -Wextra Task06/main.cpp -o Task06/main && ./Task06/main
+[Bicycle]     CYC-01 | Rate: Rs.100.00/day
+  -> 3-Day Rental + 10 Units + 1 Late Day = Rs. 350.00
+
+[TwoWheeler]  TN-01-AB-1111 | Service Due: 15/12/2026
+  -> 3-Day Rental + 10 Units + 1 Late Day = Rs. 2370.00
+
+[Car]         TN-01-CD-2222 | Seats: 5
+  -> 3-Day Rental + 10 Units + 1 Late Day = Rs. 6020.00
+
+[ElectricCar] TN-01-EV-3333 | Battery: 60.00 kWh
+  -> 3-Day Rental + 10 Units + 1 Late Day = Rs. 6720.00
+
+[ElectricBus] TN-01-EB-4444 | Heavy EV Fleet
+  -> 3-Day Rental + 10 Units + 1 Late Day = Rs. 16750.00

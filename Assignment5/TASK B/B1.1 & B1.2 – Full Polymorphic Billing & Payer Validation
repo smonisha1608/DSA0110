@@ -1,0 +1,126 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <vector>
+#include <memory>
+#include <algorithm>
+#include <stdexcept>
+
+class Bill {
+protected:
+    std::string patient;
+public:
+    explicit Bill(std::string p) : patient(std::move(p)) {}
+    virtual ~Bill() = default;
+    virtual double total() const = 0;
+    virtual std::string type() const { return "Bill"; }
+    virtual void print() const {
+        std::cout << std::left << std::setw(12) << type()
+                  << std::setw(12) << patient
+                  << "Total: " << std::fixed << std::setprecision(2) << total() << '\n';
+    }
+};
+
+class OutPatientBill : public Bill {
+    double consultation, tests;
+public:
+    OutPatientBill(std::string p, double c, double t)
+        : Bill(std::move(p)), consultation(c), tests(t) {
+        if (c < 0 || t < 0) throw std::invalid_argument("Negative OP charge");
+    }
+    double total() const override { return consultation + tests; }
+    std::string type() const override { return "OutPatient"; }
+};
+
+class InPatientBill : public Bill {
+    int days;
+    double roomPerDay, procedures, medicines;
+public:
+    InPatientBill(std::string p, int d, double rate, double proc, double med)
+        : Bill(std::move(p)), days(d), roomPerDay(rate), procedures(proc), medicines(med) {
+        if (d <= 0 || rate < 0 || proc < 0 || med < 0)
+            throw std::invalid_argument("Invalid IP charge");
+    }
+    double total() const override { return (days * roomPerDay) + procedures + medicines; }
+    std::string type() const override { return "InPatient"; }
+};
+
+class DayCareBill : public Bill {
+    double packagePrice;
+public:
+    DayCareBill(std::string p, double pkg)
+        : Bill(std::move(p)), packagePrice(pkg) {
+        if (pkg < 0) throw std::invalid_argument("Negative package price");
+    }
+    double total() const override { return packagePrice; }
+    std::string type() const override { return "DayCare"; }
+};
+
+class EmergencyBill : public Bill {
+    double baseCharge, hours, hourlyRate;
+public:
+    EmergencyBill(std::string p, double base, double hrs, double rate)
+        : Bill(std::move(p)), baseCharge(base), hours(hrs), hourlyRate(rate) {
+        if (base < 0 || hrs < 0 || rate < 0)
+            throw std::invalid_argument("Negative emergency charge");
+    }
+    double total() const override { return baseCharge + (hours * hourlyRate); }
+    std::string type() const override { return "Emergency"; }
+};
+
+class Payer {
+public:
+    virtual ~Payer() = default;
+    virtual double amountCovered(const Bill& b) const = 0;
+    virtual std::string name() const = 0;
+};
+
+class SelfPay : public Payer {
+public:
+    double amountCovered(const Bill&) const override { return 0.0; }
+    std::string name() const override { return "SelfPay"; }
+};
+
+class Insurance : public Payer {
+    double limit, coPayPct;
+public:
+    Insurance(double lim, double coPay) : limit(lim), coPayPct(coPay) {}
+    double amountCovered(const Bill& b) const override {
+        return std::min(b.total() * (1.0 - coPayPct / 100.0), limit);
+    }
+    std::string name() const override { return "Insurance"; }
+};
+
+class GovernmentScheme : public Payer {
+    double fixedRate;
+public:
+    explicit GovernmentScheme(double rate) : fixedRate(rate) {}
+    double amountCovered(const Bill& b) const override {
+        return std::min(b.total(), fixedRate);
+    }
+    std::string name() const override { return "GovtScheme"; }
+};
+
+int main() {
+    std::vector<std::unique_ptr<Bill>> bills;
+    bills.push_back(std::make_unique<OutPatientBill>("Ravi", 500, 1200));         // 1700
+    bills.push_back(std::make_unique<InPatientBill>("Meena", 3, 2500, 30000, 10000)); // 47500
+    bills.push_back(std::make_unique<DayCareBill>("Arjun", 15000));               // 15000
+    bills.push_back(std::make_unique<EmergencyBill>("Divya", 3000, 4.5, 1000));   // 7500
+
+    std::vector<std::unique_ptr<Payer>> payers;
+    payers.push_back(std::make_unique<SelfPay>());
+    payers.push_back(std::make_unique<Insurance>(25000.0, 10.0)); // 90% up to 25,000
+    payers.push_back(std::make_unique<GovernmentScheme>(10000.0)); // capped at 10,000
+
+    for (const auto& b : bills) {
+        b->print();
+        for (const auto& p : payers) {
+            double cov = p->amountCovered(*b);
+            std::cout << "   " << std::setw(12) << p->name()
+                      << " Covered: " << std::setw(8) << cov
+                      << " | Patient Pays: " << (b->total() - cov) << '\n';
+        }
+    }
+    return 0;
+}

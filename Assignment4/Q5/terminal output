@@ -1,0 +1,7 @@
+$ g++ -std=c++17 -Wall -Wextra Task05/main.cpp -o Task05/main && ./Task05/main
+Cart 1 Total:   225
+Dyn Cart Total: 1425
+Highest Total:  1425
+
+$ g++ -std=c++17 -Wall -Wextra Task05/complete_code.cpp -o Task05/complete_code && ./Task05/complete_code
+324

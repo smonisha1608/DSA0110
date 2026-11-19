@@ -1,0 +1,20 @@
+Bill Object (Abstract - cannot instantiate directly)
+vtable for Bill:
++-----------------------+---------------------------+
+| Slot 0: ~Bill()       | &Bill::~Bill()            |
+| Slot 1: total()       | __cxa_pure_virtual (0)    |
++-----------------------+---------------------------+
+
+OutPatientBill Instance (heap)         vtable for OutPatientBill:
++-----------------------+              +-----------------------+------------------------------+
+| vptr -----------------|------------->| Slot 0: ~OPBill()     | &OutPatientBill::~OPBill()   |
+| billId, patientName   |              | Slot 1: total()       | &OutPatientBill::total()     |
+| consultation, tests   |              +-----------------------+------------------------------+
++-----------------------+
+
+InPatientBill Instance (heap)          vtable for InPatientBill:
++-----------------------+              +-----------------------+------------------------------+
+| vptr -----------------|------------->| Slot 0: ~IPBill()     | &InPatientBill::~IPBill()    |
+| billId, patientName   |              | Slot 1: total()       | &InPatientBill::total()      |
+| days, rate, proc, med |              +-----------------------+------------------------------+
++-----------------------+

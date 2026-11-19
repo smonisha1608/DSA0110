@@ -1,0 +1,18 @@
+$ g++ -std=c++17 -Wall -Wextra Task03/main.cpp -o Task03/main && ./Task03/main
+sizeof(TeachingAssistant): 168 bytes
+
+Student lifecycle: Address Person Course Student 
+Destroying:        ~Student ~Course ~Person ~Address 
+
+Staff lifecycle:   Address Person Staff 
+Destroying:        ~Staff ~Person ~Address 
+
+TA lifecycle:      Address Person Course Student Staff TA 
+Destroying:        ~TA ~Staff ~Student ~Course ~Person ~Address 
+
+$ g++ -std=c++17 -Wall -Wextra Task03/predict_output.cpp -o Task03/predict_output && ./Task03/predict_output
+Vehicle Engine Car 
+~Car ~Engine ~Vehicle 
+
+$ g++ -std=c++17 -Wall -Wextra Task03/complete_code.cpp -o Task03/complete_code && ./Task03/complete_code
+Priya (19) | 192524152 | Chennai-600001

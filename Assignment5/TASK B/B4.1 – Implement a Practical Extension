@@ -1,0 +1,20 @@
+class TelemedicineBill : public Bill {
+    double videoConsultFee, digitalRxFee;
+public:
+    TelemedicineBill(std::string p, double consult, double rx)
+        : Bill(std::move(p)), videoConsultFee(consult), digitalRxFee(rx) {
+        if (consult < 0 || rx < 0) throw std::invalid_argument("Negative telemedicine fee");
+    }
+    double total() const override { return videoConsultFee + digitalRxFee; }
+    std::string type() const override { return "Telemedicine"; }
+};
+
+class CharityFundPayer : public Payer {
+    double grantPool;
+public:
+    explicit CharityFundPayer(double pool) : grantPool(pool) {}
+    double amountCovered(const Bill& b) const override {
+        return std::min(b.total(), grantPool);
+    }
+    std::string name() const override { return "CharityFund"; }
+};

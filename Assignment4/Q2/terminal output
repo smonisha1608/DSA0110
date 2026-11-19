@@ -1,0 +1,6 @@
+$ g++ -std=c++17 -Wall -Wextra Task02/main.cpp -o Task02/main && ./Task02/main
+TA: Ananya (ID: 201) | Prog: M.Tech CSE | Dept: CSE | Course: DSA01
+Scholar: Vikram (ID: 202) | Agency: DST-INSPIRE | Stipend: 37000
+
+$ g++ -std=c++17 -Wall -Wextra Task02/predict_output.cpp -o Task02/predict_output && ./Task02/predict_output
+Person Student Staff TA

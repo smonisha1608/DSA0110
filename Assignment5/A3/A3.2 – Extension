@@ -1,0 +1,14 @@
+class CorporateTieUp : public Payer {
+private:
+    std::string companyName;
+    double discountPercent;
+    double annualCap;
+public:
+    CorporateTieUp(std::string comp, double disc, double cap)
+        : companyName(std::move(comp)), discountPercent(disc), annualCap(cap) {}
+    double amountCovered(const Bill& bill) const override {
+        double covered = bill.total() * (discountPercent / 100.0);
+        return std::min(covered, annualCap);
+    }
+    std::string payerName() const override { return "Corporate (" + companyName + ")"; }
+};

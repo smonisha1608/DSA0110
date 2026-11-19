@@ -1,0 +1,4 @@
+$ g++ -std=c++17 -Wall -Wextra Task01/main.cpp -o Task01/main && ./Task01/main
+ID: 101 | Dr. Rao | Pay: 128600
+ID: 102 | Kiran | Pay: 49700
+ID: 103 | Meera | Pay: 48000

@@ -1,0 +1,51 @@
+#include <string>
+#include <algorithm>
+#include <stdexcept>
+
+class Bill; // Forward declaration
+
+class Payer {
+public:
+    virtual ~Payer() = default;
+    virtual double amountCovered(const Bill& bill) const = 0;
+    virtual std::string payerName() const = 0;
+};
+
+class SelfPay : public Payer {
+public:
+    double amountCovered(const Bill& /*bill*/) const override {
+        return 0.0; // Insurance/scheme covers 0; patient pays 100%
+    }
+    std::string payerName() const override { return "SelfPay"; }
+};
+
+class Insurance : public Payer {
+private:
+    std::string provider;
+    double coverLimit;
+    double coPayPercent; // e.g., 10.0 means patient pays 10%, insurer covers 90%
+public:
+    Insurance(std::string prov, double limit, double coPay)
+        : provider(std::move(prov)), coverLimit(limit), coPayPercent(coPay) {
+        if (limit < 0 || coPay < 0 || coPay > 100)
+            throw std::invalid_argument("Invalid insurance parameters");
+    }
+    double amountCovered(const Bill& bill) const override {
+        double eligible = bill.total() * (1.0 - coPayPercent / 100.0);
+        return std::min(eligible, coverLimit);
+    }
+    std::string payerName() const override { return "Insurance (" + provider + ")"; }
+};
+
+class GovernmentScheme : public Payer {
+private:
+    std::string schemeName;
+    double fixedPackageRate;
+public:
+    GovernmentScheme(std::string name, double packageRate)
+        : schemeName(std::move(name)), fixedPackageRate(packageRate) {}
+    double amountCovered(const Bill& bill) const override {
+        return std::min(bill.total(), fixedPackageRate);
+    }
+    std::string payerName() const override { return "GovtScheme (" + schemeName + ")"; }
+};

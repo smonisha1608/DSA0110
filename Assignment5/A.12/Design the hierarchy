@@ -1,0 +1,27 @@
++-------------------------------------------+
+                  |            <<abstract>> Bill              |
+                  +-------------------------------------------+
+                  | # billId : string                         |
+                  | # patientName : string                    |
+                  +-------------------------------------------+
+                  | + Bill(id: string, patient: string)       |
+                  | + virtual ~Bill() = default               |
+                  | + virtual total() const : double = 0 {PV} |
+                  | + virtual type() const : string = 0 {PV}  |
+                  | + virtual print() const : void {V}        |
+                  +-------------------------------------------+
+                                        ^
+          +--------------------+--------+--------+--------------------+
+          |                    |                 |                    |
++-------------------+ +-----------------+ +-----------------+ +-------------------+
+|  OutPatientBill   | |  InPatientBill  | |   DayCareBill   | |   EmergencyBill   |
++-------------------+ +-----------------+ +-----------------+ +-------------------+
+| - consultation    | | - days : int    | | - packagePrice  | | - baseCharge      |
+| - testCharges     | | - roomPerDay    | +-----------------+ | - hours : double  |
++-------------------+ | - procedures    | | + total() {O}   | | - hourlyRate      |
+| + total() {O}     | | - medicines     | | + type() {O}    | +-------------------+
+| + type() {O}      | +-----------------+ +-----------------+ | + total() {O}     |
++-------------------+ | + total() {O}   |                   | + type() {O}      |
+                      | + type() {O}    |                   +-------------------+
+                      +-----------------+
+Legend: {PV} = Pure Virtual (= 0), {V} = Virtual, {O} = Overridden

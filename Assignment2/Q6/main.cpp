@@ -1,90 +1,185 @@
 #include <iostream>
-#include <chrono>
-using namespace std;
-using namespace chrono;
+#include <cstring>
+#include <stdexcept>
+#include <cstddef>
 
-class Time
-{
-    int h, m;
+class Text {
+private:
+    std::size_t length;
+    char* data;
 
 public:
-    Time(int hh, int mm) : h(hh), m(mm) {}
+    // Default and parameterized constructor
+    explicit Text(const char* value = "")
+        : length(0), data(nullptr) {
 
-    friend int minutesBetween(const Time& a, const Time& b);
-    friend bool earlier(const Time& a, const Time& b);
+        if (value == nullptr) {
+            throw std::invalid_argument("Text cannot be null.");
+        }
+
+        length = std::strlen(value);
+        data = new char[length + 1];
+
+        std::memcpy(data, value, length + 1);
+    }
+
+    // Deep copy constructor
+    Text(const Text& other)
+        : length(other.length), data(new char[other.length + 1]) {
+
+        std::memcpy(data, other.data, length + 1);
+
+        std::cout << "Copy constructor called.\n";
+    }
+
+    // Copy assignment operator
+    Text& operator=(const Text& other) {
+        if (this != &other) {
+            char* newData = new char[other.length + 1];
+
+            std::memcpy(newData, other.data, other.length + 1);
+
+            delete[] data;
+
+            data = newData;
+            length = other.length;
+        }
+
+        std::cout << "Copy assignment called.\n";
+
+        return *this;
+    }
+
+    // Destructor
+    ~Text() {
+        delete[] data;
+    }
+
+    // Concatenation assignment
+    Text& operator+=(const Text& other) {
+        char* newData = new char[length + other.length + 1];
+
+        std::memcpy(newData, data, length);
+        std::memcpy(newData + length, other.data,
+                    other.length + 1);
+
+        delete[] data;
+
+        data = newData;
+        length += other.length;
+
+        return *this;
+    }
+
+    // Concatenation operator
+    Text operator+(const Text& other) const {
+        Text result(*this);
+        result += other;
+        return result;
+    }
+
+    // Equality operator
+    bool operator==(const Text& other) const {
+        return std::strcmp(data, other.data) == 0;
+    }
+
+    // Inequality operator
+    bool operator!=(const Text& other) const {
+        return !(*this == other);
+    }
+
+    // Output operator
+    friend std::ostream& operator<<(std::ostream& out,
+                                    const Text& text) {
+        out << text.data;
+        return out;
+    }
+
+    std::size_t size() const {
+        return length;
+    }
 };
 
-inline int minutesBetween(const Time& a, const Time& b)
-{
-    int first = a.h * 60 + a.m;
-    int second = b.h * 60 + b.m;
+int main() {
+    std::cout << "DYNAMIC TEXT CLASS\n\n";
 
-    int difference = first - second;
+    // Constructor
+    Text first("Hello");
+    Text second(" World");
 
-    return difference < 0 ? -difference : difference;
-}
+    std::cout << "First text: " << first << '\n';
+    std::cout << "Second text: " << second << '\n';
 
-inline bool earlier(const Time& a, const Time& b)
-{
-    if (a.h != b.h)
-        return a.h < b.h;
+    // Copy constructor
+    std::cout << "\n1. Deep Copy Constructor\n";
 
-    return a.m < b.m;
-}
+    Text copied = first;
 
-int normalMinutesBetween(int a, int b)
-{
-    int difference = a - b;
-    return difference < 0 ? -difference : difference;
-}
+    std::cout << "Copied text: " << copied << '\n';
 
-inline int inlineMinutesBetween(int a, int b)
-{
-    int difference = a - b;
-    return difference < 0 ? -difference : difference;
-}
+    // Modify the original through concatenation
+    Text extra(" C++");
+    first += extra;
 
-int main()
-{
-    Time departure(9, 45);
-    Time arrival(13, 10);
-    Time same(12, 30);
+    std::cout << "Modified original: " << first << '\n';
+    std::cout << "Copied text remains: " << copied << '\n';
 
-    cout << minutesBetween(departure, arrival) << ' '
-         << boolalpha << earlier(arrival, departure) << '\n';
+    // Copy assignment
+    std::cout << "\n2. Copy Assignment\n";
 
-    cout << "Same time difference: "
-         << minutesBetween(same, same) << '\n';
+    Text assigned;
+    assigned = second;
 
-    cout << "Before noon comparison: "
-         << earlier(Time(11, 50), Time(12, 10)) << '\n';
+    std::cout << "Assigned text: " << assigned << '\n';
 
-    const int iterations = 10000000;
-    volatile long long result = 0;
+    // Self assignment
+    std::cout << "\n3. Self Assignment\n";
 
-    auto start1 = high_resolution_clock::now();
+    assigned = assigned;
 
-    for (int i = 0; i < iterations; i++)
-        result = result + normalMinutesBetween(i % 1440, (i + 1) % 1440);
+    std::cout << "After self assignment: " << assigned << '\n';
 
-    auto end1 = high_resolution_clock::now();
+    // + operator
+    std::cout << "\n4. Addition Operator\n";
 
-    auto start2 = high_resolution_clock::now();
+    Text combined = first + second;
 
-    for (int i = 0; i < iterations; i++)
-        result = result + inlineMinutesBetween(i % 1440, (i + 1) % 1440);
+    std::cout << "Combined text: " << combined << '\n';
 
-    auto end2 = high_resolution_clock::now();
+    // Comparison operators
+    std::cout << "\n5. Comparison Operators\n";
 
-    cout << "Non-inline time: "
-         << duration_cast<milliseconds>(end1 - start1).count()
-         << " ms\n";
+    Text a("FASTGO");
+    Text b("FASTGO");
+    Text c("Business");
 
-    cout << "Inline time: "
-         << duration_cast<milliseconds>(end2 - start2).count()
-         << " ms\n";
+    std::cout << "a == b: " << (a == b) << '\n';
+    std::cout << "a != c: " << (a != c) << '\n';
 
-    cout << "Check value: " << result << '\n';
+    // Empty text
+    std::cout << "\n6. Empty Text\n";
+
+    Text empty;
+
+    std::cout << "Empty text: [" << empty << "]\n";
+    std::cout << "Empty text length: " << empty.size() << '\n';
+
+    // Long text
+    std::cout << "\n7. Long Text\n";
+
+    Text longText(
+        "Dynamic memory allocation and deep copying "
+        "in C++ programming."
+    );
+
+    std::cout << longText << '\n';
+    std::cout << "Length: " << longText.size() << '\n';
+
+    std::cout << "\nEnd of program.\n";
 
     return 0;
 }
+
+
+   
+        

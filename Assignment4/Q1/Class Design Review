@@ -1,0 +1,16 @@
+## 1.1 Diagnosis
+1. **Repeated Fields:** `name`, `id`, `basic`, and `da` are duplicated across `Professor` and `LabAssistant`.
+2. **Public Data Members:** Breaks encapsulation; external code can set negative salaries or invalid IDs.
+3. **Inconsistent Naming:** `GuestFaculty` uses `nm` and `code` instead of `name` and `id`.
+4. **Unused Data Member:** `da` is declared in `Professor` and `LabAssistant` but never used.
+5. **Magic Number:** `0.42` is hardcoded in multiple `pay()` methods.
+6. **No Common Base / Polymorphism:** Payroll cannot process all staff in a single heterogeneous container.
+
+## 1.3 Design Defence
+Extracting common attributes (`name`, `id`, `basic`, `DA_RATE`) into abstract base classes (`Staff` and `RegularStaff`) with a pure virtual `pay()` method eliminates duplication and enforces a uniform interface. Adding a new staff category—such as `ResearchAssociate`—requires only creating one new subclass and overriding `pay()`, keeping existing classes and payroll loops untouched (Open/Closed Principle).
+
+## Complexity & Alternative Analysis
+- **Alternative:** Single `Staff` class with an `enum class StaffType` and `switch(type)` inside `pay()`.
+- **Time Complexity:** $O(1)$ per `pay()` call in both (vtable indirection vs. switch jump table).
+- **Space Complexity:** Hierarchy allocates only fields needed per type + 8-byte `vptr`. Single class wastes ~16–24 bytes per object on unused fields.
+- **Places Changed for New Type:** Hierarchy = **1 place** (new subclass); Single class = **4 places** (enum, fields, constructor, switch case).
